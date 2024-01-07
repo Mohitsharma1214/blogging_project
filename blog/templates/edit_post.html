@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Post - Your Site{% endblock %}
+
+{% block extra_css %}
+    <!-- Include TinyMCE CSS file -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tinymce@5.10.2/build/skins/ui/oxide/skin.min.css">
+    <!-- Add any additional CSS specific to the edit form -->
+    <style>
+        /* Your custom styles */
+        /* Ensure images align properly */
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h1>Edit Post</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- Include form fields -->
+        <div>
+            {{ post_form.title.label_tag }}
+            {{ post_form.title }}
+        </div>
+        <div>
+            {{ post_form.content.label_tag }}
+            {{ post_form.content }}
+        </div>
+        <div>
+            {{ post_form.category.label_tag }}
+            {{ post_form.category }}
+        </div>
+        <div>
+            {{ post_form.image.label_tag }}
+            {{ post_form.image }}
+            {% if post_form.image.value %}
+                <button type="button" onclick="clearImage()">Clear Image</button>
+            {% endif %}
+        </div>
+        <!-- Add other form fields as needed -->
+
+        <button type="submit">Save Changes</button>
+    </form>
+
+    <!-- Include TinyMCE JS file -->
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@5.10.2/tinymce.min.js"></script>
+    <script>
+        tinymce.init({
+            selector: 'textarea#id_content',
+            height: 500,
+            plugins: 'image code',
+            toolbar: 'formatselect | bold italic | numlist bullist | image code',
+            images_upload_url: '/upload/image',
+            /* Add more configuration options based on your requirements */
+        });
+
+        function clearImage() {
+            document.getElementById('id_image').value = '';
+            // Optionally, remove the displayed image
+            // For example:
+            // document.getElementById('displayed_image').remove();
+        }
+    </script>
+{% endblock %}

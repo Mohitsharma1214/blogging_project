@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}User Home - Your Site Title{% endblock %}
+
+{% block content %}
+    <h2>Welcome to User Home!</h2>
+    
+    <!-- Displaying Posts or any other content for the user's home page -->
+    {% for post in posts %}
+        <div>
+            <span>Post {{ forloop.counter }} <b>:</b></span>
+                    <a href="{% url 'post_detail' post.id %}" target="_blank">{{ post.title }}</a>
+            
+        </div>
+        <hr>
+    {% empty %}
+        <p>No posts available.</p>
+    {% endfor %}
+    
+    <!-- Additional content for the user's home page -->
+</div>
+{% endblock %}

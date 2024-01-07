@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Your Site Title{% endblock %}</title>
+    <style>
+        /* Resetting default styles */
+        body, h1, h2, h3, p, ul, ol, li {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Global styles */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header styles */
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+        }
+
+        header nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        header nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        header nav ul li a {
+            text-decoration: none;
+            color: #fff;
+        }
+
+        /* Main content styles */
+        main {
+            flex: 1;
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        /* Additional Styles */
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ccc; /* Border after each post */
+            padding-bottom: 10px;
+        }
+
+        .post-options a {
+            margin-left: 10px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .create-post-btn {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <ul>
+                <!-- Navigation links -->
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'profile' %}">Profile</a></li>
+                    {% if user.is_superuser %}
+                        <li><a href="{% url 'admin_home' %}">Admin</a></li>
+                    {% else %}
+                        <li><a href="{% url 'user_home' %}">Home</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                {% else %}
+                    <li><a href="{% url 'register' %}">Register</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                   
+                {% endif %}
+                {% if user.is_superuser %}
+                {{user.username}}(Admin)
+            {% else %}
+                {{user.username}}
+                                   
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+     <br>
+    <footer>
+        <!-- Your footer content -->
+        &copy; 2024 Your Site. All rights reserved.
+    </footer>
+
+</body>
+</html>

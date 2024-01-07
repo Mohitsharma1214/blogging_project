@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Admin Home - Your Site{% endblock %}
+
+{% block content %}
+    <style>
+        /* Additional Styles */
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ccc; /* Border after each post */
+            padding-bottom: 10px;
+        }
+
+        .post-options a {
+            margin-left: 10px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .create-post-btn {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .no-post-msg {
+            font-style: italic;
+            color: #888;
+            margin-top: 20px;
+        }
+    </style>
+
+    <h1>Admin Home</h1>
+    {% if posts %}
+        <!-- Display existing posts -->
+        <ul>
+            {% for post in posts %}
+                <li>
+                    <span>Post {{ forloop.counter }} <b>:</b></span>
+                    <a href="{% url 'post_detail' post.id %}" target="_blank">{{ post.title }}</a>
+                    <div class="post-options">
+                        <a href="{% url 'delete_post' post.id %}">Delete</a>
+                        <a href="{% url 'edit_post' post.id %}">Edit</a>
+                    </div>
+                </li>
+                <!-- Display other post details as needed -->
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-post-msg">No posts yet.</p>
+    {% endif %}
+    
+    <!-- Button to create a new post -->
+    <button onclick="window.location.href='{% url 'create_post' %}'" class="create-post-btn">Create a New Post</button>
+{% endblock %}

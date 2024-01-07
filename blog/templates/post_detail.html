@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}Post Detail - Your Site Title{% endblock %}
+
+{% block content %}
+    <style>
+        /* Additional Styles */
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        /* Custom styles for comments and replies */
+        .comment {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .reply {
+            margin-left: 20px;
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+
+    <!-- Display post details -->
+    <h2>{{ post.title }}</h2>
+    
+    <div>
+        {% for item in content_items %}
+            {% if item.type == 'text' %}
+                <div>
+                    <p>{{ item.content | safe }}</p>
+                </div>
+            {% elif item.type == 'image' %}
+                <div>
+                    <img src="{{ item.url }}" alt="Image">
+                </div>
+            {% else %}
+                <div>
+                    {{ item.content | safe }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% if image_url %}
+        <!-- Resize the image to fit the page -->
+        <img src="{{ image_url }}" alt="Post Image">
+    {% endif %}
+    
+    <!-- Display comments and reply forms -->
+    <div class="comments-section">
+        {% for comment in comments %}
+            <div class="comment">
+                <h2>Comment:</h2>
+                <p>{{ comment.content }}</p>
+                {% if comment.author.is_superuser %}
+                    <p>By: {{ comment.author.username }} (Admin)</p>
+                {% else %}
+                    <p>By: {{ comment.author.username }}</p>
+                {% endif %}
+                <p>Upvotes: {{ comment.upvotes }}</p>
+                
+                <!-- Upvote button for comments -->
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="upvote_comment" value="{{ comment.id }}">
+                    <button type="submit" name="upvote">Upvote</button>
+                </form>
+
+                <!-- Delete and Edit comment form -->
+                {% if comment.author == request.user %}
+                    <!-- Delete and Edit options for the author -->
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_comment" value="{{ comment.id }}">
+                        <button type="submit">Delete Comment</button>
+                    </form>
+                    <button onclick="editComment('{{ comment.id }}')">Edit Comment</button>
+                    <div id="editComment{{ comment.id }}" style="display: none;">
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="edit_comment" value="{{ comment.id }}">
+                            <textarea name="edited_comment">{{ comment.content }}</textarea>
+                            <button type="submit">Update Comment</button>
+                        </form>
+                    </div>
+                {% endif %}
+                
+                <!-- Reply button for comments -->
+                <button onclick="showReplyForm('{{ comment.id }}')">Reply</button>
+
+                <!-- Reply form for each comment -->
+                <div id="replyForm{{ comment.id }}" style="display: none;">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="parent_comment_id" value="{{ comment.id }}">
+                        {{ reply_form.as_p }}
+                        <button type="submit" name="reply">Submit Reply</button>
+                    </form>
+                </div>
+                
+                <!-- Display replies to the comment -->
+                <div class="replies-section">
+                    {% for reply in comment.replies.all %}
+                        <div class="reply">
+                            <h2>Reply:</h2>
+                            <p>{{ reply.content }}</p>
+                            {% if reply.author.is_superuser %}
+                                <p>By: {{ reply.author.username }} (Admin)</p>
+                            {% else %}
+                                <p>By: {{ reply.author.username }}</p>
+                            {% endif %}
+                            <p>Upvotes: {{ reply.upvotes }}</p>
+                            
+                            <!-- Upvote button for replies -->
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="upvote_reply" value="{{ reply.id }}">
+                                <button type="submit" name="upvote">Upvote</button>
+                            </form>
+
+                            <!-- Delete and Edit reply form -->
+                            {% if reply.author == request.user %}
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="delete_reply" value="{{ reply.id }}">
+                                    <button type="submit">Delete Reply</button>
+                                </form>
+                                <button onclick="editReply('{{ reply.id }}')">Edit Reply</button>
+                                <div id="editReply{{ reply.id }}" style="display: none;">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="edit_reply" value="{{ reply.id }}">
+                                        <textarea name="edited_reply">{{ reply.content }}</textarea>
+                                        <button type="submit">Update Reply</button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <p>No replies yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <hr>
+        {% empty %}
+            <p>No comments available.</p>
+        {% endfor %}
+    </div>
+    
+    <!-- Form for adding a new comment -->
+    <form method="post">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <button type="submit" name="comment">Add Comment</button>
+    </form>
+
+    <!-- JavaScript to toggle reply form visibility -->
+    <script>
+        function showReplyForm(commentId) {
+            var replyForm = document.getElementById('replyForm' + commentId);
+            if (replyForm.style.display === 'none' || replyForm.style.display === '') {
+                replyForm.style.display = 'block';
+            } else {
+                replyForm.style.display = 'none';
+            }
+        }
+
+        function editComment(commentId) {
+            var editComment = document.getElementById('editComment' + commentId);
+            if (editComment.style.display === 'none' || editComment.style.display === '') {
+                editComment.style.display = 'block';
+            } else {
+                editComment.style.display = 'none';
+            }
+        }
+
+        function editReply(replyId) {
+            var editReply = document.getElementById('editReply' + replyId);
+            if (editReply.style.display === 'none' || editReply.style.display === '') {
+                editReply.style.display = 'block';
+            } else {
+                editReply.style.display = 'none';
+            }
+        }
+    </script>
+{% endblock %}

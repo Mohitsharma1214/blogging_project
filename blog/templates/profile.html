@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}User Profile - Your Site{% endblock %}
+
+{% block content %}
+    <h1>User Profile</h1>
+    <button onclick="showUpdateForm()">Edit Profile</button>
+    <form method="post" id="updateForm" style="display: none;">
+        {% csrf_token %}
+        {{ profile_form.as_p }}
+        <button type="submit">Update Profile</button>
+    </form>
+
+    <script>
+        function showUpdateForm() {
+            var updateForm = document.getElementById('updateForm');
+            if (updateForm.style.display === 'none') {
+                updateForm.style.display = 'block';
+            } else {
+                updateForm.style.display = 'none';
+            }
+        }
+    </script>
+{% endblock %}
